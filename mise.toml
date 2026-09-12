@@ -1,0 +1,26 @@
+[tools]
+go = "1.27.1"
+
+[tasks.fmt]
+description = "Format Go source files"
+run = "gofmt -w $(find . -name '*.go' -not -path './.git/*')"
+
+[tasks.fmt-check]
+description = "Verify Go source files are formatted"
+run = "test -z \"$(gofmt -l $(find . -name '*.go' -not -path './.git/*'))\""
+
+[tasks.vet]
+description = "Run Go static analysis"
+run = "go vet ./..."
+
+[tasks.test]
+description = "Run Go tests"
+run = "go test ./..."
+
+[tasks.lint]
+description = "Run formatting and static analysis"
+depends = ["fmt-check", "vet"]
+
+[tasks.check]
+description = "Run the full local quality gate"
+depends = ["lint", "test"]

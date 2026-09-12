@@ -1,0 +1,13 @@
+changelog-check:
+  image: golang:1.27
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - git fetch --tags origin
+    - go install github.com/zwing99/change-log-magician/cmd/clm@latest
+    - clm cut --check --require-fragment --base "$CI_MERGE_REQUEST_DIFF_BASE_SHA"
+    - clm next-version --json --prerelease-id "pr.${CI_MERGE_REQUEST_IID}.${CI_COMMIT_SHORT_SHA}"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# A protected default-branch job can run `clm cut`, then push its commit and tags.

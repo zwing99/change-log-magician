@@ -1,0 +1,8 @@
+[paths]
+changelog = "CHANGELOG.md"
+fragments = "changelog.d"
+archive = "changelog.d/archive"
+
+[tags]
+release_prefix = "v"
+clm_prefix = "clm/v"
