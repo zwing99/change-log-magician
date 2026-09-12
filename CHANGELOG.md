@@ -12,6 +12,10 @@ Helpful commands:
 
 ## [Unreleased]
 
+### Added
+
+- Publish durable OpenSpec specifications for CLM's changelog, release, pipeline, and CLI capabilities.
+
 ## [0.0.1] - 2026-09-12
 
 ### Added
