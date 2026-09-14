@@ -49,6 +49,10 @@ jobs:
         with:
           fetch-depth: 0
       - uses: jdx/mise-action@v2
+      - name: Configure the CI Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Create the CI-owned prerelease tag
         run: |
           git tag -a "$TAG" -m "Pull request beta $TAG"

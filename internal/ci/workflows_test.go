@@ -19,7 +19,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "main cut only consumes active fragments and pushes CLM state",
 			file: "cut-release.yml",
 			contains: []string{
-				"branches: [main]", "changelog.d/*.md", "fetch-depth: 0", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
+				"branches: [main]", "changelog.d/*.md", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
 			},
 			omits: []string{"git tag", "clm next-version"},
 		},
@@ -35,7 +35,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "pull requests validate before same repository beta publication",
 			file: "ci.yml",
 			contains: []string{
-				"clm cut --check --require-fragment", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "git tag -a \"$TAG\"", "prerelease: true",
+				"clm cut --check --require-fragment", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "github-actions[bot]", "git tag -a \"$TAG\"", "prerelease: true",
 			},
 		},
 	}
