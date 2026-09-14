@@ -19,7 +19,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "main cut only consumes active fragments and pushes CLM state",
 			file: "cut-release.yml",
 			contains: []string{
-				"branches: [main]", "actions/checkout@v6", "jdx/mise-action@v4", "changelog.d/**", "!changelog.d/archive/**", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
+				"branches: [main]", "actions/checkout@v6", "jdx/mise-action@v4", "changelog.d/**", "!changelog.d/archive/**", "find changelog.d -maxdepth 1 -type f -name '*.md'", "steps.active-fragments.outputs.present == 'true'", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
 			},
 			omits: []string{"git tag", "clm next-version"},
 		},

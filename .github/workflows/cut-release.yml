@@ -19,12 +19,24 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_PUSH_TOKEN }}
       - uses: jdx/mise-action@v4
+      - id: active-fragments
+        name: Detect active changelog fragments
+        run: |
+          if find changelog.d -maxdepth 1 -type f -name '*.md' -print -quit | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Configure the CI Git identity
+        if: steps.active-fragments.outputs.present == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - run: mise run check
+      - if: steps.active-fragments.outputs.present == 'true'
+        run: mise run check
       - name: Cut the planned release
+        if: steps.active-fragments.outputs.present == 'true'
         run: go run ./cmd/clm cut
       - name: Push CLM-created Git state
+        if: steps.active-fragments.outputs.present == 'true'
         run: git push origin HEAD:main --follow-tags
