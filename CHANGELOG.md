@@ -12,9 +12,12 @@ Helpful commands:
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-09-14
+
 ### Added
 
 - Publish durable OpenSpec specifications for CLM's changelog, release, pipeline, and CLI capabilities.
+- Automate cross-platform release builds, pull-request beta prereleases, and stable GitHub Releases with changelog-derived descriptions.
 
 ## [0.0.1] - 2026-09-12
 
