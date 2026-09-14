@@ -2,4 +2,4 @@
 
 ## Added
 
-- Automate versioned release builds and GitHub release publication.
+- Automate cross-platform release builds, pull-request beta prereleases, and stable GitHub Releases with changelog-derived descriptions.
