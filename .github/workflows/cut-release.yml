@@ -1,0 +1,29 @@
+name: Cut CLM release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "changelog.d/*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  cut:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_PUSH_TOKEN }}
+      - uses: jdx/mise-action@v2
+      - name: Configure the CI Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: mise run check
+      - name: Cut the planned release
+        run: go run ./cmd/clm cut
+      - name: Push CLM-created Git state
+        run: git push origin HEAD:main --follow-tags

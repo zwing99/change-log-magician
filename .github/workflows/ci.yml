@@ -14,3 +14,55 @@ jobs:
           fetch-depth: 0
       - uses: jdx/mise-action@v2
       - run: mise run check
+      - name: Validate pull-request fragments
+        if: github.event_name == 'pull_request'
+        run: go run ./cmd/clm cut --check --require-fragment --base "origin/${{ github.base_ref }}"
+  plan-beta:
+    needs: check
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@v2
+      - id: version
+        name: Derive a CI-owned beta tag
+        run: |
+          plan="$(go run ./cmd/clm next-version --json --prerelease-id "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}")"
+          version="$(printf '%s' "$plan" | jq -r '.prerelease // empty')"
+          if [ -n "$version" ]; then
+            echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          fi
+  publish-beta:
+    needs: plan-beta
+    if: github.event_name == 'pull_request' && needs.plan-beta.outputs.tag != '' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.plan-beta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@v2
+      - name: Configure the CI Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Create the CI-owned prerelease tag
+        run: |
+          git tag -a "$TAG" -m "Pull request beta $TAG"
+          git push origin "refs/tags/$TAG"
+      - name: Build prerelease artifacts
+        run: mise run release-build -- "$TAG"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.TAG }}
+          prerelease: true
+          body: "Candidate for pull request #${{ github.event.number }}."
+          files: dist/*
