@@ -1,4 +1,4 @@
-name: Validate release notes
+name: Validate and publish pull-request beta
 
 on:
   pull_request:
@@ -7,13 +7,18 @@ jobs:
   changelog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: jdx/mise-action@v2
-      - run: go install github.com/zwing99/change-log-magician/cmd/clm@latest
-      - run: clm cut --check --require-fragment --base "origin/${{ github.base_ref }}"
+      - uses: jdx/mise-action@v4
+      - run: go run ./cmd/clm cut --check --require-fragment --base "origin/${{ github.base_ref }}"
       - id: version
-        run: echo 'plan<<EOF' >> "$GITHUB_OUTPUT"; clm next-version --json --prerelease-id "pr.${{ github.event.number }}.${{ github.sha }}" >> "$GITHUB_OUTPUT"; echo EOF >> "$GITHUB_OUTPUT"
+        run: echo 'plan<<EOF' >> "$GITHUB_OUTPUT"; go run ./cmd/clm next-version --json --prerelease-id "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"; echo EOF >> "$GITHUB_OUTPUT"
 
-# A protected push-to-main workflow can run `clm cut`, then `git push --follow-tags`.
+# Same-repository PRs can turn `.prerelease` into a CI-owned beta tag, run
+# `mise run release-build -- "$TAG"`, and publish it with `action-gh-release`.
+# Fork PRs must stop after the validation job: do not expose write credentials.
+# A protected main workflow runs `mise run check`, `clm cut`, then pushes only
+# CLM's resulting commit and tags with a GitHub App token or scoped PAT.
+# A separate stable-tag workflow runs only for `vX.Y.Z`; it builds and publishes
+# the GitHub Release body extracted from that checked-out tag's CHANGELOG.md.

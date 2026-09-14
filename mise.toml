@@ -24,3 +24,11 @@ depends = ["fmt-check", "vet"]
 [tasks.check]
 description = "Run the full local quality gate"
 depends = ["lint", "test"]
+
+[tasks.release-build]
+description = "Cross-compile release artifacts for an explicit vX.Y.Z tag"
+run = "./scripts/release-build.sh"
+
+[tasks.release-build-check]
+description = "Verify release artifact assembly and version validation"
+run = "./scripts/release-build-test.sh"
