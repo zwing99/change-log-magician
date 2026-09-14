@@ -8,6 +8,7 @@
 - Add table-driven tests and fixtures for behavior changes. Use temporary Git repositories for Git integration tests.
 - When fixing a bug, add a regression test that demonstrates the failure and protects the intended behavior.
 - Run `mise run check` before handing off changes.
+- Before opening or updating a pull request, fetch and rebase its branch onto `origin/main`.
 - When ignore rules need to change, generate the base template with gitignore.io and retain its source URL in `.gitignore`.
 - Do not add hidden state, silently rewrite user-authored changelog content, or make network/forge API calls from CLM.
 - CLM never pushes. CI owns credentials and pushes the release commit and tags after `clm cut` succeeds.
