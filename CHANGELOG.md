@@ -12,6 +12,10 @@ Helpful commands:
 
 ## [Unreleased]
 
+### Added
+
+- Archive the completed release workflow trigger OpenSpec change.
+
 ## [0.0.3] - 2026-09-14
 
 ### Added
