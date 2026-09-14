@@ -2,4 +2,4 @@
 
 ## Added
 
-- Prevent release workflow reruns from archived fragments and release tags.
+- Prevent redundant release-cut and setup-workflow runs from archived fragments and release tags.
