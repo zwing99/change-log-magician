@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "changelog.d/*.md"
+      - "changelog.d/**"
+      - "!changelog.d/archive/**"
 
 permissions:
   contents: write
