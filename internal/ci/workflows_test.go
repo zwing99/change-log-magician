@@ -19,7 +19,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "main cut only consumes active fragments and pushes CLM state",
 			file: "cut-release.yml",
 			contains: []string{
-				"branches: [main]", "changelog.d/*.md", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
+				"branches: [main]", "actions/checkout@v6", "jdx/mise-action@v4", "changelog.d/*.md", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
 			},
 			omits: []string{"git tag", "clm next-version"},
 		},
@@ -27,7 +27,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "stable publisher only builds from stable tag and changelog body",
 			file: "release.yml",
 			contains: []string{
-				"v[0-9]+.[0-9]+.[0-9]+", "workflow_dispatch", "mise run release-build -- \"$TAG\"", "go run ./cmd/release-notes \"$TAG\" > release-notes.md", "body_path: release-notes.md",
+				"v[0-9]+.[0-9]+.[0-9]+", "workflow_dispatch", "actions/checkout@v6", "jdx/mise-action@v4", "softprops/action-gh-release@v3", "mise run release-build -- \"$TAG\"", "go run ./cmd/release-notes \"$TAG\" > release-notes.md", "body_path: release-notes.md",
 			},
 			omits: []string{"./cmd/clm cut", "git push", "git tag"},
 		},
@@ -35,7 +35,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "pull requests validate before same repository beta publication",
 			file: "ci.yml",
 			contains: []string{
-				"clm cut --check --require-fragment", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "github-actions[bot]", "git tag -a \"$TAG\"", "prerelease: true",
+				"actions/checkout@v6", "jdx/mise-action@v4", "softprops/action-gh-release@v3", "clm cut --check --require-fragment", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "github-actions[bot]", "git tag -a \"$TAG\"", "prerelease: true",
 			},
 		},
 	}

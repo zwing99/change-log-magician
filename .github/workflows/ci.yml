@@ -9,10 +9,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v4
       - run: mise run check
       - name: Validate pull-request fragments
         if: github.event_name == 'pull_request'
@@ -24,10 +24,10 @@ jobs:
     outputs:
       tag: ${{ steps.version.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v4
       - id: version
         name: Derive a CI-owned beta tag
         run: |
@@ -45,10 +45,10 @@ jobs:
     env:
       TAG: ${{ needs.plan-beta.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v4
       - name: Configure the CI Git identity
         run: |
           git config user.name "github-actions[bot]"
@@ -59,7 +59,7 @@ jobs:
           git push origin "refs/tags/$TAG"
       - name: Build prerelease artifacts
         run: mise run release-build -- "$TAG"
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ env.TAG }}

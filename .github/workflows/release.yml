@@ -27,16 +27,16 @@ jobs:
             exit 1
           }
           git ls-remote --exit-code --tags "https://github.com/${{ github.repository }}" "refs/tags/$TAG"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ env.TAG }}
           fetch-depth: 0
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v4
       - name: Build release artifacts
         run: mise run release-build -- "$TAG"
       - name: Extract the cut changelog entry
         run: go run ./cmd/release-notes "$TAG" > release-notes.md
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ env.TAG }}

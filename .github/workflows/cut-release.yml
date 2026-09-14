@@ -13,11 +13,11 @@ jobs:
   cut:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_PUSH_TOKEN }}
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v4
       - name: Configure the CI Git identity
         run: |
           git config user.name "github-actions[bot]"
