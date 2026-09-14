@@ -16,6 +16,10 @@ Helpful commands:
 
 - Archive the completed release workflow trigger OpenSpec change.
 
+### Fixed
+
+- Avoid failed release-cut jobs when a push contains only archived changelog fragments.
+
 ## [0.0.3] - 2026-09-14
 
 ### Added
