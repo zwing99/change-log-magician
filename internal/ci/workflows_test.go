@@ -19,7 +19,7 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			name: "main cut only consumes active fragments and pushes CLM state",
 			file: "cut-release.yml",
 			contains: []string{
-				"branches: [main]", "actions/checkout@v6", "jdx/mise-action@v4", "changelog.d/*.md", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
+				"branches: [main]", "actions/checkout@v6", "jdx/mise-action@v4", "changelog.d/**", "!changelog.d/archive/**", "fetch-depth: 0", "github-actions[bot]", "mise run check", "go run ./cmd/clm cut", "git push origin HEAD:main --follow-tags", "RELEASE_PUSH_TOKEN",
 			},
 			omits: []string{"git tag", "clm next-version"},
 		},
@@ -36,6 +36,13 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			file: "ci.yml",
 			contains: []string{
 				"actions/checkout@v6", "jdx/mise-action@v4", "softprops/action-gh-release@v3", "clm cut --check --require-fragment", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "github-actions[bot]", "git tag -a \"$TAG\"", "prerelease: true",
+			},
+		},
+		{
+			name: "Copilot setup ignores release tags",
+			file: "copilot-setup-steps.yml",
+			contains: []string{
+				"workflow_dispatch:", "pull_request:", "push:", "branches:", "\"**\"", ".github/workflows/copilot-setup-steps.yml",
 			},
 		},
 	}
