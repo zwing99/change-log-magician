@@ -31,10 +31,11 @@ jobs:
       - id: version
         name: Derive a CI-owned beta tag
         run: |
-          plan="$(go run ./cmd/clm next-version --json --prerelease-id "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}")"
-          version="$(printf '%s' "$plan" | jq -r '.prerelease // empty')"
+          plan="$(go run ./cmd/clm next-version --json)"
+          version="$(printf '%s' "$plan" | jq -r '.version // empty')"
           if [ -n "$version" ]; then
-            echo "tag=v$version" >> "$GITHUB_OUTPUT"
+            prerelease="$(go run ./cmd/clm next-version --json --prerelease-id "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}" | jq -r '.prerelease')"
+            echo "tag=v$prerelease" >> "$GITHUB_OUTPUT"
           fi
   publish-beta:
     needs: plan-beta

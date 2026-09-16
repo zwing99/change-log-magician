@@ -37,7 +37,67 @@ clm next-version --json
 clm cut
 ```
 
-Fragments live directly under `changelog.d/`. They use one level heading (`[major]`, `[minor]`, `[patch]`, or `[unreleased]`) and the standard Keep a Changelog categories. Every merge request or pull request must contribute a valid fragment. Use `new-unreleased` for changes that should appear under the persistent root `Unreleased` section without producing a tag by themselves.
+## Changelog fragments for an MR
+
+Each merge request (MR) or pull request adds one small Markdown fragment directly under `changelog.d/`, alongside its code change. The fragment is the release-note source for that MR: it tells CLM both whether the change should create a stable release and what users should read in its changelog entry. Do not edit `CHANGELOG.md` as part of the MR; CLM assembles it when a release is cut.
+
+Use the release intent that best describes the MR:
+
+| Command | Use when the MR contains | Result at the next cut |
+| --- | --- | --- |
+| `clm new-major` | a breaking change | next major version |
+| `clm new-minor` | a backwards-compatible feature | next minor version |
+| `clm new-patch` | a backwards-compatible fix or small change | next patch version |
+| `clm new-unreleased` | a note that belongs in `Unreleased` but must not create a stable tag | no stable version by itself |
+
+For example, a feature MR can create its fragment and add user-visible notes as it is developed:
+
+```bash
+clm new-minor shell-completions
+clm added -m "Add shell completion support"
+clm fixed -m "Preserve quoted completion arguments"
+```
+
+`new-minor` creates a timestamped file, such as `changelog.d/20260915-120000-shell-completions.md`, with the required level heading. Each entry command adds a bullet to the correct category and writes the category heading when needed. The completed file looks like this:
+
+```md
+# [minor]
+
+## Added
+
+- Add shell completion support
+
+## Fixed
+
+- Preserve quoted completion arguments
+```
+
+The first heading must be exactly one of `[major]`, `[minor]`, `[patch]`, or `[unreleased]`. Entries are bullets under the standard Keep a Changelog categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, or `Security`. Empty categories are omitted. Keep entries concise and user-facing: describe the behavior someone receives, rather than an implementation detail or MR number.
+
+CLM normally selects the only active fragment automatically, so a patch MR can be authored without opening the file:
+
+```bash
+clm new-patch escaped-json
+clm fixed -m "Escape control characters in JSON output"
+clm changed -m "Use the configured indentation for JSON output"
+```
+
+If your checkout has more than one active fragment, choose the MR's file explicitly with `--change` (or `-c`):
+
+```bash
+clm security --change changelog.d/20260915-120000-escaped-json.md \
+  --message "Reject malformed signature headers"
+```
+
+Omit `--message` to enter a short entry interactively, or use `--editor` to compose one in `$EDITOR`. You can also edit a fragment by hand, provided it retains the required level heading, recognized category headings, and non-empty `- ` bullet entries.
+
+Before pushing or opening the MR, validate the exact change against its target branch:
+
+```bash
+clm cut --check --require-fragment --base origin/main
+```
+
+Commit the generated `changelog.d/*.md` file with the MR. After the MR merges, the authorized release workflow runs `clm cut`; it combines active fragments into `CHANGELOG.md`, archives the consumed files, and creates release tags when a major, minor, or patch fragment is present.
 
 `clm cut` creates the changelog/archive commit. A stable cut creates annotated `vX.Y.Z` and `clm/vX.Y.Z` tags but never pushes them. CI must provide credentials only to the post-merge job that pushes those results.
 

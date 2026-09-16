@@ -32,10 +32,10 @@ func TestReleaseWorkflowsKeepReleaseBoundaries(t *testing.T) {
 			omits: []string{"./cmd/clm cut", "git push", "git tag"},
 		},
 		{
-			name: "pull requests validate before same repository beta publication",
+			name: "pull requests skip beta publication for unreleased-only fragments",
 			file: "ci.yml",
 			contains: []string{
-				"actions/checkout@v6", "jdx/mise-action@v4", "softprops/action-gh-release@v3", "clm cut --check --require-fragment", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "github-actions[bot]", "git tag -a \"$TAG\"", "prerelease: true",
+				"actions/checkout@v6", "jdx/mise-action@v4", "softprops/action-gh-release@v3", "clm cut --check --require-fragment", "plan=\"$(go run ./cmd/clm next-version --json)\"", "version=\"$(printf '%s' \"$plan\" | jq -r '.version // empty')\"", "if [ -n \"$version\" ]; then", "beta.pr.${{ github.event.number }}.${{ github.event.pull_request.head.sha }}", "head.repo.full_name == github.repository", "github-actions[bot]", "git tag -a \"$TAG\"", "prerelease: true",
 			},
 		},
 		{
