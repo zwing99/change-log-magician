@@ -16,6 +16,11 @@ Helpful commands:
 
 - Archive the completed release workflow trigger OpenSpec change.
 
+### Changed
+
+- Document the merge-request changelog fragment workflow
+- Skip beta publication for unreleased-only pull requests
+
 ### Fixed
 
 - Avoid failed release-cut jobs when a push contains only archived changelog fragments.
